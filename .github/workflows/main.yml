@@ -22,3 +22,5 @@ jobs:
           aosp-clang: true
           aosp-clang-version: r596125
           anykernel3: true
+          release: true
+          access-token: ${{ secrets.GITHUB_TOKEN }}
