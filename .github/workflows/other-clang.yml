@@ -1,4 +1,4 @@
-name: Build Vanilla Kernel (other-clang)
+name: Build Vanilla Kernel (LLVM)
 
 on:
   workflow_dispatch:
@@ -18,6 +18,10 @@ jobs:
           kernel-branch: android12-5.10
           config: gki_defconfig
           arch: arm64
-          other-clang-url: https://github.com/llvm/llvm-project/
+          other-gcc32-url: https://github.com/gcc-mirror/gcc
+          other-gcc32-branch: releases/gcc-16
+          other-gcc64-url: https://github.com/gcc-mirror/gcc
+          other-gcc64-branch: releases/gcc-16
+          other-clang-url: https://github.com/llvm/llvm-project
           other-clang-branch: release/23.x
           anykernel3: true
