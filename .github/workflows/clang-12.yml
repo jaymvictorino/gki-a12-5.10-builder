@@ -1,0 +1,24 @@
+name: Build Vanilla Kernel (Clang 12)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-kernel:
+    name: Build Kernel
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Build
+        uses: dabao1955/kernel_build_action@main
+        with:
+          kernel-url: https://github.com/ramabondanp/android_kernel_common-5.10
+          kernel-branch: android12-5.10
+          config: gki_defconfig
+          arch: arm64
+          aosp-gcc: true
+          aosp-clang: true
+          aosp-clang-version: r416183b
+          anykernel3: true
