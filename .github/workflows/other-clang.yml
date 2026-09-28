@@ -1,0 +1,23 @@
+name: Build Vanilla Kernel
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-kernel:
+    name: Build Kernel
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Build
+        uses: dabao1955/kernel_build_action@main
+        with:
+          kernel-url: https://github.com/ramabondanp/android_kernel_common-5.10
+          kernel-branch: android12-5.10
+          config: gki_defconfig
+          arch: arm64
+          other-clang-url: https://github.com/llvm/llvm-project/
+          other-clang-branch: release/23.x
+          anykernel3: true
