@@ -23,5 +23,5 @@ jobs:
           other-gcc32-branch: releases/gcc-16
           other-gcc64-url: https://github.com/gcc-mirror/gcc
           other-gcc64-branch: releases/gcc-16
-          other-clang-url: https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.2/LLVM-23.1.2-Linux-X64.tar.xz
+          other-clang-url: https://github.com/Neutron-Toolchains/clang-build-catalogue/releases/download/06092026/neutron-clang-06092026.tar.zst
           anykernel3: true
