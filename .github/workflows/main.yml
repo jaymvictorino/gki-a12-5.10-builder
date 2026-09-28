@@ -20,5 +20,5 @@ jobs:
           arch: arm64
           aosp-gcc: true
           aosp-clang: true
-          aosp-clang-version: r614150
+          aosp-clang-version: r596125
           anykernel3: true
