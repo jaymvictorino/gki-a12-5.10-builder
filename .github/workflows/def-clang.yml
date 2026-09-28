@@ -1,4 +1,4 @@
-name: Build Vanilla Kernel (Clang 12)
+name: Build Vanilla Kernel (def-clang)
 
 on:
   workflow_dispatch:
@@ -20,5 +20,5 @@ jobs:
           arch: arm64
           aosp-gcc: true
           aosp-clang: true
-          aosp-clang-version: r416183b
+          aosp-clang-version: r383902
           anykernel3: true
