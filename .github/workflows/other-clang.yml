@@ -1,4 +1,4 @@
-name: Build Vanilla Kernel (LLVM)
+name: Build Vanilla Kernel (clang-r596125)
 
 on:
   workflow_dispatch:
@@ -20,3 +20,4 @@ jobs:
           arch: arm64
           other-clang-url: https://github.com/jaymvictorino/clang-r596125-mirror/releases/download/v0.0.1/linux-x86-refs-heads-mirror-goog-main-llvm-toolchain-source-clang-r596125.tar.gz
           anykernel3: true
+          extra-make-args: ["LLVM=1", "LLVM_IAS=1"]
