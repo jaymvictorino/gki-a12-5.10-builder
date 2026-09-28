@@ -18,8 +18,11 @@ jobs:
           kernel-branch: android12-5.10
           config: gki_defconfig
           arch: arm64
+          other-gcc32-url: https://github.com/jaymvictorino/clang-r596125-mirror/releases/download/v0.0.1/arm-linux-androideabi-4.9-refs-heads-main.tar.gz
+          other-gcc64-url: https://github.com/jaymvictorino/clang-r596125-mirror/releases/download/v0.0.1/aarch64-linux-android-4.9-refs-heads-main.tar.gz
           other-clang-url: https://github.com/jaymvictorino/clang-r596125-mirror/releases/download/v0.0.1/linux-x86-refs-heads-mirror-goog-main-llvm-toolchain-source-clang-r596125.tar.gz
           anykernel3: true
           anykernel3-url: https://github.com/osm0sis/AnyKernel3
           release: true
           access-token: ${{ secrets.GITHUB_TOKEN }}
+          extra-make-args: LLVM=1
