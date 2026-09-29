@@ -1,4 +1,4 @@
-name: Build Vanilla Kernel (def-clang)
+name: Build Vanilla Kernel (llvm)
 
 on:
   workflow_dispatch:
@@ -18,7 +18,10 @@ jobs:
           kernel-branch: android12-5.10
           config: gki_defconfig
           arch: arm64
-          aosp-gcc: true
-          aosp-clang: true
-          aosp-clang-version: r383902
+          aosp-clang: false
+          aosp-gcc: false
+          other-clang-url: https://github.com/llvm/llvm-project/releases/download/llvmorg-23.1.2/LLVM-23.1.2-Linux-X64.tar.xz
           anykernel3: true
+          release: true
+          access-token: ${{ secrets.GITHUB_TOKEN }}
+          extra-make-args: '["LLVM=1", "LLVM_IAS=1"]'
