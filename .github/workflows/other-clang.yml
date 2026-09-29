@@ -24,7 +24,7 @@ jobs:
           other-gcc64-url: https://github.com/xiangfeidexiaohuo/GCC-4.9
           other-gcc32-branch: arm32
           other-gcc64-branch: gcc4.9
-          other-clang-url: https://github.com/jaymvictorino/clang-r596125-mirror/releases/download/v0.0.1/linux-x86-refs-heads-mirror-goog-main-llvm-toolchain-source-clang-r596125.tar.gz
+          other-clang-url: https://github.com/jaymvictorino/clang-r596125-mirror/releases/download/v0.0.1/linux-x86-refs-heads-mirror-goog-main-llvm-toolchain-source-clang-r596125.tar.gz LLVM=1
           anykernel3: true
           anykernel3-url: https://github.com/osm0sis/AnyKernel3
           release: true
