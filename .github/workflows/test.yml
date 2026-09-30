@@ -12,18 +12,16 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Build
-        uses: dabao1955/kernel_build_action@main
+        uses: dabao1955/kernel_build_action@v1.10.4
         with:
           kernel-url: https://github.com/ramabondanp/android_kernel_common-5.10
           kernel-branch: android12-5.10
           config: gki_defconfig
+          ccache: true
           arch: arm64
-          aosp-clang: false
-          aosp-gcc: false
-          # REMOVED: other-gcc32-url, other-gcc32-branch, other-gcc64-url, other-gcc64-branch
-          other-clang-url: https://github.com/jaymvictorino/clang-r596125-mirror/releases/download/v0.0.1/linux-x86-refs-heads-mirror-goog-main-llvm-toolchain-source-clang-r596125.tar.gz
+          other-clang-url: 'https://github.com/bachnxuan/aosp_clang_mirror/releases/download/clang-r614150-16464736/clang-r614150.tar.gz LLVM=1'
           anykernel3: true
-          anykernel3-url: https://github.com/osm0sis/AnyKernel3
+          anykernel3-url: https://github.com/LoggingNewMemory/SuiKernel-anykernel
           release: true
           access-token: ${{ secrets.GITHUB_TOKEN }}
           extra-make-args: LLVM=1 LLVM_IAS=1
