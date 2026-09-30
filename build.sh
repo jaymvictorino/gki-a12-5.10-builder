@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # build.sh — Vanilla GKI build for ramabondanp/android_kernel_common-5.10
 #
-# This is a heavily stripped version of the SuiKernel builder. ALL root
-# modifications (KernelSU, SUSFS, SELinux injection, manager patching) have
-# been removed to preserve KMI/ABI compatibility.
+# PATCHED for GitHub Actions reliability:
+#   - LTO disabled (cuts build time ~3x, RAM usage ~2x)
+#   - CFI disabled (required when LTO is off)
+#   - ccache integration (set CCACHE_DIR env + PATH to /usr/lib/ccache in workflow)
 #
 # Usage:  ./build.sh
 # Output: ./GKI-Kernel-<version>.zip
@@ -23,6 +24,23 @@ source "$workdir/config.sh"
 source "$workdir/functions.sh"
 
 export TZ="$TIMEZONE"
+
+# ---------------------------------------------------------------------------
+# ccache — enable if available on PATH
+# ---------------------------------------------------------------------------
+if command -v ccache >/dev/null 2>&1; then
+  export CC="ccache clang"
+  export HOSTCC="ccache gcc"
+  export CCACHE_DIR="${CCACHE_DIR:-$workdir/.ccache}"
+  export CCACHE_MAXSIZE="${CCACHE_MAXSIZE:-3G}"
+  export CCACHE_COMPRESS=1
+  export CCACHE_COMPILERCHECK=content
+  mkdir -p "$CCACHE_DIR"
+  log "ccache enabled — dir: $CCACHE_DIR, max: $CCACHE_MAXSIZE"
+  ccache -z >/dev/null 2>&1 || true
+else
+  log "ccache not found — building without cache"
+fi
 
 # ---------------------------------------------------------------------------
 # Clone kernel source
@@ -61,7 +79,6 @@ fi
 tar -xf clang.tar.gz -C "$CLANG_DIR"
 rm -f clang.tar.gz
 
-# Flatten single top-level directory if present
 if [[ $(find "$CLANG_DIR" -mindepth 1 -maxdepth 1 -type d | wc -l) -eq 1 ]] \
    && [[ $(find "$CLANG_DIR" -mindepth 1 -maxdepth 1 -type f | wc -l) -eq 0 ]]; then
   SINGLE_DIR=$(find "$CLANG_DIR" -mindepth 1 -maxdepth 1 -type d)
@@ -74,7 +91,7 @@ CLANG_VERSION=$(clang -v 2>&1 | head -n1 | grep -oP 'clang version \K[0-9.]+' ||
 log "Clang version: $CLANG_VERSION"
 
 # ---------------------------------------------------------------------------
-# GCC cross-compiler (needed for some GKI targets even when Clang drives the build)
+# GCC cross-compiler
 # ---------------------------------------------------------------------------
 if ! ls "$CLANG_DIR/bin" | grep -q "aarch64-linux-gnu"; then
   log "Cloning GCC cross-compiler..."
@@ -109,17 +126,34 @@ export KBUILD_BUILD_HOST="$HOST"
 export KBUILD_BUILD_TIMESTAMP="$(date)"
 
 # ---------------------------------------------------------------------------
-# Branding — set CONFIG_LOCALVERSION so `uname -r` shows something meaningful
+# Config tweaks — branding + CI-friendly build optimizations
 # ---------------------------------------------------------------------------
 cd "$KSRC"
-# Remove check_defconfig from GKI build config to avoid redundant validation
 if [ -f "./build.config.gki" ]; then
   sed -i 's/check_defconfig//' ./build.config.gki
 fi
 
 BRAND_SUFFIX="-${KERNEL_NAME}-Vanilla"
-./scripts/config --file "$DEFCONFIG_FILE" --disable CONFIG_LOCALVERSION_AUTO
-./scripts/config --file "$DEFCONFIG_FILE" --set-str CONFIG_LOCALVERSION "$BRAND_SUFFIX"
+
+CONFIG_OPTS=(
+  --file "$DEFCONFIG_FILE"
+  --disable CONFIG_LOCALVERSION_AUTO
+  --set-str CONFIG_LOCALVERSION "$BRAND_SUFFIX"
+)
+
+# --- CI-BUILD OPTIMIZATIONS -----------------------------------------------
+# Disable LTO + CFI: these triple build time and blow past 6 GB RAM on the
+# free GitHub Actions runner, causing preemption mid-link.
+CONFIG_OPTS+=(
+  --disable LTO_CLANG
+  --disable LTO_CLANG_THIN
+  --disable LTO_CLANG_FULL
+  --disable CFI_CLANG
+  --enable  LTO_NONE
+)
+# --------------------------------------------------------------------------
+
+./scripts/config "${CONFIG_OPTS[@]}"
 
 CURRENT_KERNEL_RELEASE_NAME="${LINUX_VERSION}${BRAND_SUFFIX}"
 log "Kernel release string: $CURRENT_KERNEL_RELEASE_NAME"
@@ -130,7 +164,7 @@ log "Kernel release string: $CURRENT_KERNEL_RELEASE_NAME"
 log "Generating config..."
 make "${BUILD_FLAGS[@]}" "$KERNEL_DEFCONFIG"
 
-log "Building kernel Image + modules..."
+log "Building kernel Image + modules (no LTO)..."
 make "${BUILD_FLAGS[@]}" Image modules
 
 # ---------------------------------------------------------------------------
@@ -146,6 +180,14 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+# ccache stats (if enabled)
+# ---------------------------------------------------------------------------
+if command -v ccache >/dev/null 2>&1; then
+  log "ccache stats:"
+  ccache -s || true
+fi
+
+# ---------------------------------------------------------------------------
 # Package with AnyKernel
 # ---------------------------------------------------------------------------
 cd "$workdir"
@@ -154,7 +196,6 @@ rm -rf anykernel_base anykernel
 git clone -q --depth=1 "$ANYKERNEL_REPO" -b "$ANYKERNEL_BRANCH" anykernel_base
 cp -r anykernel_base anykernel
 
-# Inject Image + version string
 if [ -f "$KERNEL_IMAGE" ]; then
   cp "$KERNEL_IMAGE" anykernel/
 else
