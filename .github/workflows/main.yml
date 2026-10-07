@@ -19,7 +19,10 @@ jobs:
           config: gki_defconfig
           ccache: true
           arch: arm64
-          other-clang-url: https://github.com/bachnxuan/aosp_clang_mirror/releases/download/clang-r614150-16464736/clang-r614150.tar.gz
+          aosp-gcc: true
+          aosp-clang: true
+          android-version: 12
+          # other-clang-url: https://github.com/bachnxuan/aosp_clang_mirror/releases/download/clang-r614150-16464736/clang-r614150.tar.gz
           anykernel3: true
           anykernel3-url: https://github.com/LoggingNewMemory/SuiKernel-anykernel
           release: true
