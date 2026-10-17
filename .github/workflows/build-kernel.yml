@@ -1,0 +1,81 @@
+name: Build Kernel (android12-5.10 GKI)
+
+# Manual trigger only.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Rama982-RE/r26-noSU
+    runs-on: ubuntu-22.04
+    timeout-minutes: 240
+
+    steps:
+      # 1. Check out THIS repo (workflow + build script + AnyKernel3 config).
+      - name: Checkout build scripts
+        uses: actions/checkout@v4
+
+      # 2. Check out the kernel source into ./kernel.
+      - name: Checkout kernel source
+        uses: actions/checkout@v4
+        with:
+          repository: ramabondanp/android_kernel_common-5.10
+          ref: android12-5.10
+          path: kernel
+          fetch-depth: 0
+
+      # 3. Free disk space — a full LTO kernel build needs ~25+ GB.
+      - name: Free up disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: false
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false
+
+      # 4. Install host dependencies + Python packages for KMI verification.
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            bc bison build-essential ccache cpio curl device-tree-compiler \
+            flex git libelf-dev libssl-dev lz4 make python3 python3-pip \
+            rsync unzip zip zstd libncurses-dev
+          pip3 install --no-cache-dir lxml rich
+
+      # 5. Copy the user's build script into the kernel tree and run it.
+      - name: Build kernel
+        working-directory: kernel
+        run: |
+          cp ../scripts/build.sh build.sh
+          chmod +x build.sh
+          ./build.sh
+
+      # 6. Sanity-check the produced Image before packaging.
+      - name: Verify kernel image
+        run: |
+          ls -lh kernel/out/arch/arm64/boot/Image
+          file kernel/out/arch/arm64/boot/Image
+
+      # 7. Package into an AnyKernel3 flashable zip.
+      - name: Package AnyKernel3
+        run: |
+          git clone --depth=1 https://github.com/jaymvictorino/AnyKernel3.git /tmp/AnyKernel3
+          cp kernel/out/arch/arm64/boot/Image /tmp/AnyKernel3/Image
+          cd /tmp/AnyKernel3
+          zip -r9 "$GITHUB_WORKSPACE/AK3-hwhe-VNL.zip" . \
+            -x ".git/*" "README.md" "LICENSE"
+
+      # 8. Upload the AnyKernel3 zip.
+      - name: Upload AnyKernel3 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AK3-hwhe-VNL
+          path: AK3-hwhe-VNL.zip
+          if-no-files-found: error
