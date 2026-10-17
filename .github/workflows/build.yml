@@ -16,16 +16,15 @@ jobs:
     steps:
       # 1. Check out THIS repo (workflow + build script + AnyKernel3 config).
       - name: Checkout build scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # 2. Check out the kernel source into ./kernel.
       - name: Checkout kernel source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: ramabondanp/android_kernel_common-5.10
           ref: android12-5.10
           path: kernel
-          fetch-depth: 0
 
       # 3. Free disk space — a full LTO kernel build needs ~25+ GB.
       - name: Free up disk space
