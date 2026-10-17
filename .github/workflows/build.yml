@@ -73,7 +73,7 @@ jobs:
 
       # 8. Upload the AnyKernel3 zip.
       - name: Upload AnyKernel3 artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: AK3-hwhe-VNL
           path: AK3-hwhe-VNL.zip
