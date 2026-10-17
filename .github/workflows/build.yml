@@ -3,6 +3,15 @@ name: Build Kernel (android12-5.10)
 # Manual trigger only.
 on:
   workflow_dispatch:
+    inputs:
+      variant:
+        description: 'Kernel variant'
+        required: true
+        default: 'VNL'
+        type: choice
+        options:
+          - VNL
+          - KSU
 
 permissions:
   contents: read
@@ -13,12 +22,12 @@ env:
 
 jobs:
   build:
-    name: Build android12-5.10 GKI
+    name: Build android12-5.10 GKI (${{ inputs.variant }})
     runs-on: ubuntu-22.04
     timeout-minutes: 240
 
     steps:
-      # 1. Check out THIS repo (workflow + build script + AnyKernel3 config).
+      # 1. Check out THIS repo (workflow + build script).
       - name: Checkout build scripts
         uses: actions/checkout@v7
 
@@ -52,7 +61,16 @@ jobs:
             rsync unzip zip zstd libncurses-dev
           pip3 install --no-cache-dir lxml rich
 
-      # 5. Copy the user's build script into the kernel tree and run it.
+      # ---------------------------------------------------------------
+      # 5a. BakaSU integration – only runs when “bakasu” is selected.
+      # ---------------------------------------------------------------
+      - name: Integrate BakaSU
+        if: ${{ inputs.variant == 'KSU' }}
+        working-directory: kernel
+        run: |
+          curl -LSs "https://raw.githubusercontent.com/Baka-SU/BakaSU/main/kernel/setup.sh" | bash
+
+      # 5b. Copy the user's build script into the kernel tree and run it.
       - name: Build kernel
         working-directory: kernel
         run: |
@@ -72,13 +90,13 @@ jobs:
           git clone --depth=1 https://github.com/jaymvictorino/AnyKernel3.git /tmp/AnyKernel3
           cp kernel/out/arch/arm64/boot/Image /tmp/AnyKernel3/Image
           cd /tmp/AnyKernel3
-          zip -r9 "$GITHUB_WORKSPACE/AK3-hwhe-${KERNEL_VERSION}-VNL.zip" . \
+          zip -r9 "$GITHUB_WORKSPACE/AK3-hwhe-${KERNEL_VERSION}-${VARIANT}.zip" . \
             -x ".git/*" "README.md" "LICENSE"
 
       # 8. Upload the AnyKernel3 zip.
       - name: Upload AnyKernel3 artifact
         uses: actions/upload-artifact@v7
         with:
-          name: AK3-hwhe-${{ env.KERNEL_VERSION }}-VNL
-          path: AK3-hwhe-${{ env.KERNEL_VERSION }}-VNL.zip
+          name: AK3-hwhe-${{ env.KERNEL_VERSION }}-${{ inputs.variant }}
+          path: AK3-hwhe-${{ env.KERNEL_VERSION }}-${{ inputs.variant }}.zip
           if-no-files-found: error
