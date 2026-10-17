@@ -1,4 +1,4 @@
-name: Build Kernel (android12-5.10 GKI)
+name: Build Kernel (android12-5.10)
 
 # Manual trigger only.
 on:
