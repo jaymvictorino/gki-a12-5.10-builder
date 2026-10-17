@@ -55,6 +55,11 @@ setup_environment() {
            TZ="$TIMEZONE"
 }
 
+setup_nomount() {
+    log_info "Mengintegrasikan NoMount ke dalam kernel..."
+    curl -fsSL https://raw.githubusercontent.com/maxsteeel/nomount/refs/heads/dev/kernel/setup.sh | bash -
+}
+
 configure_kernel() {
     log_info "Menyiapkan konfigurasi kernel..."
     mkdir -p "$OUT_DIR"
@@ -94,6 +99,7 @@ main() {
 
     fetch_toolchain "clang-$LLVM_MAJOR" "$CLANG_URL" "$CLANG_HOME" bin/clang
     setup_environment
+    setup_nomount
     configure_kernel
     build_kernel
 
