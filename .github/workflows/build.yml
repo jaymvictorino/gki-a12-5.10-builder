@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Rama982-RE/r26-noSU
+    name: Build android12-5.10 GKI
     runs-on: ubuntu-22.04
     timeout-minutes: 240
 
