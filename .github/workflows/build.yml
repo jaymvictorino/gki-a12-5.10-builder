@@ -68,13 +68,13 @@ jobs:
           git clone --depth=1 https://github.com/jaymvictorino/AnyKernel3.git /tmp/AnyKernel3
           cp kernel/out/arch/arm64/boot/Image /tmp/AnyKernel3/Image
           cd /tmp/AnyKernel3
-          zip -r9 "$GITHUB_WORKSPACE/AK3-hwhe-VNL.zip" . \
+          zip -r9 "$GITHUB_WORKSPACE/AK3-hwhe-android12-5.10.270-VNL.zip" . \
             -x ".git/*" "README.md" "LICENSE"
 
       # 8. Upload the AnyKernel3 zip.
       - name: Upload AnyKernel3 artifact
         uses: actions/upload-artifact@v7
         with:
-          name: AK3-hwhe-VNL
-          path: AK3-hwhe-VNL.zip
+          name: AK3-hwhe-android12-5.10.270-VNL
+          path: AK3-hwhe-android12-5.10.270-VNL.zip
           if-no-files-found: error
