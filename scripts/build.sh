@@ -66,7 +66,9 @@ configure_kernel() {
     printf '%s' "-g$(git rev-parse --short HEAD 2>/dev/null || true)" > .scmversion
     make O="$OUT_DIR" gki_defconfig
     scripts/config --file "$OUT_DIR/.config" \
-        -e LTO_CLANG -e LTO_CLANG_THIN -d LTO_NONE -d LTO_CLANG_FULL
+        -e LTO_CLANG -e LTO_CLANG_THIN -d LTO_NONE -d LTO_CLANG_FULL \
+        -e NOMOUNT
+        
     make O="$OUT_DIR" olddefconfig savedefconfig
 }
 
