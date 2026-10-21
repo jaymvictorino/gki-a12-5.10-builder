@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # --- Configuration ---------------------------------------------------------
-readonly LLVM_VERSION="23.1.3"
+readonly LLVM_VERSION="23.1.4"
 readonly LLVM_ARCH="x86_64"
 readonly LLVM_MAJOR="${LLVM_VERSION%%.*}"
 readonly TOOLCHAIN_ROOT="$HOME/kernel/toolchain"
