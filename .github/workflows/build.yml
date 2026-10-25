@@ -12,7 +12,7 @@ on:
         options:
           - VNL
           - KSU
-          
+
       build_type:
         description: 'Build type'
         required: true
@@ -29,6 +29,8 @@ permissions:
 env:
   KERNEL_VERSION: android12-5.10.270
   VARIANT: ${{ inputs.variant }}
+  BUILD_TYPE: ${{ inputs.build_type }}
+  STAGE_SUFFIX: ${{ inputs.build_type == 'staging' && '-staging' || '' }}
 
 jobs:
   build:
