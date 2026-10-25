@@ -12,6 +12,15 @@ on:
         options:
           - VNL
           - KSU
+          
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'normal'
+        type: choice
+        options:
+          - normal
+          - staging
 
 permissions:
   contents: read
