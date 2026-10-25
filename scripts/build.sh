@@ -11,9 +11,16 @@ readonly CLANG_URL="https://mirrors.edge.kernel.org/pub/tools/llvm/files/llvm-${
 readonly CLANG_HOME="$TOOLCHAIN_ROOT/clang-${LLVM_MAJOR}"
 readonly OUT_DIR="out"
 readonly TARGET_ARCH="arm64"
-readonly LOCAL_VERSION="-hwhe"
 readonly TIMEZONE="Asia/Manila"
 rc=0  # Di-set oleh EXIT trap saat failure, dibaca dari trap itu juga.
+
+# --- Build Type (normal or staging) ---------------------------------------------------------------
+readonly BUILD_TYPE="${BUILD_TYPE:-normal}"
+if [[ "$BUILD_TYPE" == "staging" ]]; then
+    readonly LOCAL_VERSION="-hwhe-idk"
+else
+    readonly LOCAL_VERSION="-hwhe"
+fi
 
 # --- Logging ---------------------------------------------------------------
 log_info() { printf '\033[0;32m[INFO]\033[0m %s\n' "$1"; }
