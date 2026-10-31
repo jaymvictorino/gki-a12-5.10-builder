@@ -22,6 +22,15 @@ on:
           - normal
           - staging
 
+      output:
+        description: 'Output'
+        required: true
+        default: 'actions'
+        type: choice
+        options: 
+          - actions
+          - release
+
 permissions:
   contents: write
 
