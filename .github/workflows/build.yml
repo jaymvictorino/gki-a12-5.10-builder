@@ -161,3 +161,42 @@ jobs:
           name: AK3-hwhe-${{ env.KERNEL_VERSION }}-${{ env.VARIANT }}-${{ env.STAGE_SUFFIX }}
           path: AK3-hwhe-${{ env.KERNEL_VERSION }}-${{ env.VARIANT }}-${{ env.STAGE_SUFFIX }}.zip
           if-no-files-found: error
+      
+      # 9. Create GitHub release — only when the user picked "release".
+      - name: Create GitHub release
+        if: inputs.output == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.KERNEL_VERSION }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}
+          name: ${{ env.KERNEL_VERSION }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}
+          body: |
+            ## GKI build — android12-5.10
+
+            **Kernel version:** `${{ steps.buildinfo.outputs.kver }}`
+            **Variant:** `${{ env.VARIANT }}` &nbsp;•&nbsp; **Build type:** `${{ env.BUILD_TYPE }}`
+
+            ### Build info
+
+            | Item | Value |
+            |------|-------|
+            | Kernel commit | [`${{ steps.buildinfo.outputs.kcommit_short }}`](https://github.com/ramabondanp/android_kernel_common-5.10/commit/${{ steps.buildinfo.outputs.kcommit_long }}) |
+            | Source branch | `${{ inputs.build_type == 'staging' && 'android12-5.10-staging' || 'android12-5.10' }}` |
+            | LLVM version | `${{ steps.buildinfo.outputs.llvm_ver }}` |
+            | BakaSU | `${{ steps.buildinfo.outputs.bakasu_ver }}` |
+            | NoMount | enabled (`${{ steps.buildinfo.outputs.nomount_commit }}`) |
+            | Built at | `${{ steps.buildinfo.outputs.build_ts }}` |
+            | Workflow run | [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) |
+
+            ### Installation
+
+            Flash the AnyKernel3 zip via a custom recovery (TWRP, etc.) or a kernel manager app.
+
+            ---
+            *Built automatically by [GitHub Actions](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).*
+          files: |
+            AK3-hwhe-${{ env.KERNEL_VERSION }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}.zip
+          fail_on_unmatched_files: true
+          generate_release_notes: false
+          draft: false
+          prerelease: ${{ inputs.build_type == 'staging' }}
+          make_latest: ${{ inputs.build_type == 'normal' && 'true' || 'false' }}
