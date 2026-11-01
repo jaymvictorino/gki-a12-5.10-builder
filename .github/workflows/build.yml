@@ -36,7 +36,6 @@ permissions:
 
 # Store the version here — reference it with ${{ env.KERNEL_VERSION }}
 env:
-  KERNEL_VERSION: ${{ inputs.build_type == 'staging' && 'android12-5.10.x' || 'android12-5.10.272' }}
   VARIANT: ${{ inputs.variant }}
   BUILD_TYPE: ${{ inputs.build_type }}
   STAGE_SUFFIX: ${{ inputs.build_type == 'staging' && 'staging' || '' }}
