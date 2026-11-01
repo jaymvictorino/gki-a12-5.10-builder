@@ -112,6 +112,19 @@ jobs:
           KSRC="$GITHUB_WORKSPACE/kernel"
           OUT="$KSRC/out"
 
+          # Format: "vX.Y.Z (short_hash)" when a tag exists, "(short_hash)" otherwise.
+          format_version() {
+            local dir="$1"
+            local tag hash
+            tag=$(git -C "$dir" describe --tags --abbrev=0 2>/dev/null || true)
+            hash=$(git -C "$dir" rev-parse --short HEAD 2>/dev/null || echo "unknown")
+            if [[ -n "$tag" ]]; then
+              printf '%s (%s)' "$tag" "$hash"
+            else
+              printf '(%s)' "$hash"
+            fi
+          }
+
           KVER=$(awk -F'"' '/^#define[[:space:]]+UTS_RELEASE/{print $2; exit}' \
                     "$OUT/include/generated/utsrelease.h")
 
@@ -123,13 +136,12 @@ jobs:
 
           BAKASU_VER="n/a"
           if [[ -d "$KSRC/KernelSU/.git" ]]; then
-            BAKASU_VER=$(git -C "$KSRC/KernelSU" describe --tags --always 2>/dev/null \
-                        || git -C "$KSRC/KernelSU" rev-parse --short HEAD)
+            BAKASU_VER=$(format_version "$KSRC/KernelSU")
           fi
 
-          NOMOUNT_COMMIT="n/a"
+          NOMOUNT_VER="n/a"
           if [[ -d "$KSRC/NoMount/.git" ]]; then
-            NOMOUNT_COMMIT=$(git -C "$KSRC/NoMount" rev-parse --short HEAD)
+            NOMOUNT_VER=$(format_version "$KSRC/NoMount")
           fi
 
           BUILD_TS=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
@@ -140,7 +152,7 @@ jobs:
             echo "kcommit_long=$KCOMMIT_LONG"
             echo "llvm_ver=$LLVM_VER"
             echo "bakasu_ver=$BAKASU_VER"
-            echo "nomount_commit=$NOMOUNT_COMMIT"
+            echo "nomount_ver=$NOMOUNT_VER"
             echo "build_ts=$BUILD_TS"
           } >> "$GITHUB_OUTPUT"
 
