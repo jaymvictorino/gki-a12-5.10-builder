@@ -159,8 +159,8 @@ jobs:
       - name: Upload AnyKernel3 artifact
         uses: actions/upload-artifact@v7
         with:
-          name: AK3-hwhe-${{ env.KERNEL_VERSION }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}
-          path: AK3-hwhe-${{ env.KERNEL_VERSION }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}.zip
+          name: AK3-hwhe-${{ steps.buildinfo.outputs.kver }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}
+          path: AK3-hwhe-${{ steps.buildinfo.outputs.kver }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}.zip
           if-no-files-found: error
       
       # 9. Create GitHub release — only when the user picked "release".
