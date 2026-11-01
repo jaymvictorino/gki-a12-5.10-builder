@@ -146,11 +146,13 @@ jobs:
 
       # 7. Package into an AnyKernel3 flashable zip.
       - name: Package AnyKernel3
+        env:
+          KVER: ${{ steps.buildinfo.outputs.kver }}
         run: |
           git clone --depth=1 https://github.com/jaymvictorino/AnyKernel3.git /tmp/AnyKernel3
           cp kernel/out/arch/arm64/boot/Image /tmp/AnyKernel3/Image
           cd /tmp/AnyKernel3
-          zip -r9 "$GITHUB_WORKSPACE/AK3-hwhe-${KERNEL_VERSION}-${VARIANT}-${STAGE_SUFFIX}.zip" . \
+          zip -r9 "$GITHUB_WORKSPACE/AK3-hwhe-${KVER}-${VARIANT}-${STAGE_SUFFIX}.zip" . \
             -x ".git/*" "README.md" "LICENSE"
 
       # 8. Upload the AnyKernel3 zip.
