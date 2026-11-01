@@ -100,11 +100,50 @@ jobs:
           chmod +x build.sh
           ./build.sh
 
-      # 6. Sanity-check the produced Image before packaging.
+      # 6a. Sanity-check the produced Image before packaging.
       - name: Verify kernel image
         run: |
           ls -lh kernel/out/arch/arm64/boot/Image
           file kernel/out/arch/arm64/boot/Image
+
+      # 6b. Gather metadata for the release body.
+      - name: Collect build info
+        id: buildinfo
+        run: |
+          KSRC="$GITHUB_WORKSPACE/kernel"
+          OUT="$KSRC/out"
+
+          KVER=$(awk -F'"' '/^#define[[:space:]]+UTS_RELEASE/{print $2; exit}' \
+                    "$OUT/include/generated/utsrelease.h")
+
+          KCOMMIT_SHORT=$(git -C "$KSRC" rev-parse --short HEAD)
+          KCOMMIT_LONG=$(git -C "$KSRC" rev-parse HEAD)
+
+          LLVM_VER=$(grep -oP 'readonly LLVM_VERSION="\K[^"]+' \
+                        "$GITHUB_WORKSPACE/scripts/build.sh")
+
+          BAKASU_VER="n/a"
+          if [[ -d "$KSRC/KernelSU/.git" ]]; then
+            BAKASU_VER=$(git -C "$KSRC/KernelSU" describe --tags --always 2>/dev/null \
+                        || git -C "$KSRC/KernelSU" rev-parse --short HEAD)
+          fi
+
+          NOMOUNT_COMMIT="n/a"
+          if [[ -d "$KSRC/NoMount/.git" ]]; then
+            NOMOUNT_COMMIT=$(git -C "$KSRC/NoMount" rev-parse --short HEAD)
+          fi
+
+          BUILD_TS=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+          {
+            echo "kver=$KVER"
+            echo "kcommit_short=$KCOMMIT_SHORT"
+            echo "kcommit_long=$KCOMMIT_LONG"
+            echo "llvm_ver=$LLVM_VER"
+            echo "bakasu_ver=$BAKASU_VER"
+            echo "nomount_commit=$NOMOUNT_COMMIT"
+            echo "build_ts=$BUILD_TS"
+          } >> "$GITHUB_OUTPUT"
 
       # 7. Package into an AnyKernel3 flashable zip.
       - name: Package AnyKernel3
