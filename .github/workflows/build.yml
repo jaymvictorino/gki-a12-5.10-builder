@@ -168,8 +168,8 @@ jobs:
         if: inputs.output == 'release'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.KERNEL_VERSION }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}
-          name: ${{ env.KERNEL_VERSION }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}
+          tag_name: ${{ steps.buildinfo.outputs.kver }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}
+          name: ${{ steps.buildinfo.outputs.kver }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}
           body: |
             ## GKI build — android12-5.10
 
@@ -195,7 +195,7 @@ jobs:
             ---
             *Built automatically by [GitHub Actions](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).*
           files: |
-            AK3-hwhe-${{ env.KERNEL_VERSION }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}.zip
+            AK3-hwhe-${{ steps.buildinfo.outputs.kver }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}.zip
           fail_on_unmatched_files: true
           generate_release_notes: false
           draft: false
