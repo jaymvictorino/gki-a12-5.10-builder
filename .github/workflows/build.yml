@@ -196,7 +196,7 @@ jobs:
             | Source branch | `${{ inputs.build_type == 'staging' && 'android12-5.10-staging' || 'android12-5.10' }}` |
             | LLVM version | `${{ steps.buildinfo.outputs.llvm_ver }}` |
             | BakaSU | `${{ steps.buildinfo.outputs.bakasu_ver }}` |
-            | NoMount | enabled (`${{ steps.buildinfo.outputs.nomount_commit }}`) |
+            | NoMount | `${{ steps.buildinfo.outputs.nomount_ver }}` |
             | Built at | `${{ steps.buildinfo.outputs.build_ts }}` |
             | Workflow run | [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) |
 
