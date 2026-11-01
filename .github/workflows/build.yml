@@ -38,7 +38,7 @@ permissions:
 env:
   VARIANT: ${{ inputs.variant }}
   BUILD_TYPE: ${{ inputs.build_type }}
-  STAGE_SUFFIX: ${{ inputs.build_type == 'staging' && 'staging' || '' }}
+  STAGE_SUFFIX: ${{ inputs.build_type == 'staging' && '-staging' || '' }}
   OUTPUT: ${{ inputs.output }}
 
 jobs:
@@ -152,15 +152,15 @@ jobs:
           git clone --depth=1 https://github.com/jaymvictorino/AnyKernel3.git /tmp/AnyKernel3
           cp kernel/out/arch/arm64/boot/Image /tmp/AnyKernel3/Image
           cd /tmp/AnyKernel3
-          zip -r9 "$GITHUB_WORKSPACE/AK3-hwhe-${KVER}-${VARIANT}-${STAGE_SUFFIX}.zip" . \
+          zip -r9 "$GITHUB_WORKSPACE/AK3-hwhe-${KVER}-${VARIANT}${STAGE_SUFFIX}.zip" . \
             -x ".git/*" "README.md" "LICENSE"
 
       # 8. Upload the AnyKernel3 zip.
       - name: Upload AnyKernel3 artifact
         uses: actions/upload-artifact@v7
         with:
-          name: AK3-hwhe-${{ env.KERNEL_VERSION }}-${{ env.VARIANT }}-${{ env.STAGE_SUFFIX }}
-          path: AK3-hwhe-${{ env.KERNEL_VERSION }}-${{ env.VARIANT }}-${{ env.STAGE_SUFFIX }}.zip
+          name: AK3-hwhe-${{ env.KERNEL_VERSION }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}
+          path: AK3-hwhe-${{ env.KERNEL_VERSION }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}.zip
           if-no-files-found: error
       
       # 9. Create GitHub release — only when the user picked "release".
