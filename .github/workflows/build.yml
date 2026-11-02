@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       variant:
-        description: 'Kernel variant'
+        description: 'Kernel variant (ignored when output=release)'
         required: true
         default: 'VNL'
         type: choice
@@ -23,7 +23,7 @@ on:
           - staging
 
       output:
-        description: 'Output'
+        description: 'Output (release builds both VNL and KSU)'
         required: true
         default: 'actions'
         type: choice
