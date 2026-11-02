@@ -235,6 +235,9 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           path: artifacts
+
+      - name: Inspect downloaded artifacts
+        run: find artifacts -maxdepth 2 -type f | sort
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.buildinfo.outputs.kver }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}
