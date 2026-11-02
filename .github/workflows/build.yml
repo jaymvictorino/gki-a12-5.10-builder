@@ -61,7 +61,12 @@ jobs:
           echo "Will build: $variants"
 
   build:
-    name: Build android12-5.10 GKI (${{ inputs.variant }})
+    name: Build android12-5.10 GKI (${{ matrix.variant }})
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: ${{ fromJSON(needs.prepare.outputs.variants) }}
     runs-on: ubuntu-22.04
     timeout-minutes: 240
 
