@@ -69,6 +69,8 @@ jobs:
         variant: ${{ fromJSON(needs.prepare.outputs.variants) }}
     runs-on: ubuntu-22.04
     timeout-minutes: 240
+    env:
+      VARIANT: ${{ matrix.variant }}
 
     steps:
       # 1. Check out THIS repo (workflow + build script).
