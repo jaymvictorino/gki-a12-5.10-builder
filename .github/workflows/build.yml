@@ -230,6 +230,11 @@ jobs:
     needs: [prepare, build]
     if: inputs.output == 'release'
     runs-on: ubuntu-latest
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v7
+        with:
+          path: artifacts
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.buildinfo.outputs.kver }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}
