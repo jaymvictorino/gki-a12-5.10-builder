@@ -214,7 +214,14 @@ jobs:
             --arg ts           '${{ steps.buildinfo.outputs.build_ts }}' \
             '{kver:$kver, kcommit_short:$kcommit, kcommit_long:$kcommit_long, llvm_ver:$llvm, bakasu_ver:$bakasu, nomount_ver:$nomount, build_ts:$ts}' \
             > "metadata-${{ matrix.variant }}.json"
+
+      # 10. Upload build metadata.
+      - name: Upload build metadata
         if: inputs.output == 'release'
+        uses: actions/upload-artifact@v7
+        with:
+          name: meta-${{ matrix.variant }}
+          path: metadata-${{ matrix.variant }}.json
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.buildinfo.outputs.kver }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}
