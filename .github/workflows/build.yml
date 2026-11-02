@@ -197,9 +197,23 @@ jobs:
           name: AK3-${{ steps.buildinfo.outputs.kver }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}
           path: AK3-${{ steps.buildinfo.outputs.kver }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}.zip
           if-no-files-found: error
-      
-      # 9. Create GitHub release — only when the user picked "release".
-      - name: Create GitHub release
+
+      # 9. Save build metadata.
+      # Only when a release is going to be created: persist per-variant metadata
+      # as an artifact so the release job can read it without re-checking out.
+      - name: Save build metadata
+        if: inputs.output == 'release'
+        run: |
+          jq -n \
+            --arg kver         '${{ steps.buildinfo.outputs.kver }}' \
+            --arg kcommit      '${{ steps.buildinfo.outputs.kcommit_short }}' \
+            --arg kcommit_long '${{ steps.buildinfo.outputs.kcommit_long }}' \
+            --arg llvm         '${{ steps.buildinfo.outputs.llvm_ver }}' \
+            --arg bakasu       '${{ steps.buildinfo.outputs.bakasu_ver }}' \
+            --arg nomount      '${{ steps.buildinfo.outputs.nomount_ver }}' \
+            --arg ts           '${{ steps.buildinfo.outputs.build_ts }}' \
+            '{kver:$kver, kcommit_short:$kcommit, kcommit_long:$kcommit_long, llvm_ver:$llvm, bakasu_ver:$bakasu, nomount_ver:$nomount, build_ts:$ts}' \
+            > "metadata-${{ matrix.variant }}.json"
         if: inputs.output == 'release'
         uses: softprops/action-gh-release@v2
         with:
