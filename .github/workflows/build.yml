@@ -107,11 +107,9 @@ jobs:
             rsync unzip zip zstd libncurses-dev
           pip3 install --no-cache-dir lxml rich
 
-      # ---------------------------------------------------------------
-      # 5a. BakaSU integration – only runs when “bakasu” is selected.
-      # ---------------------------------------------------------------
+      # 5a. BakaSU integration – only for the KSU matrix entry.
       - name: Integrate BakaSU
-        if: ${{ inputs.variant == 'KSU' }}
+        if: ${{ matrix.variant == 'KSU' }}
         working-directory: kernel
         run: |
           curl -LSs "https://raw.githubusercontent.com/Baka-SU/BakaSU/main/kernel/setup.sh" | bash
