@@ -34,9 +34,7 @@ on:
 permissions:
   contents: write
 
-# Store the version here — reference it with ${{ env.KERNEL_VERSION }}
 env:
-  VARIANT: ${{ inputs.variant }}
   BUILD_TYPE: ${{ inputs.build_type }}
   STAGE_SUFFIX: ${{ inputs.build_type == 'staging' && '-staging' || '' }}
   OUTPUT: ${{ inputs.output }}
