@@ -222,6 +222,14 @@ jobs:
         with:
           name: meta-${{ matrix.variant }}
           path: metadata-${{ matrix.variant }}.json
+
+  # Consolidated release: waits for every matrix build, downloads all zips,
+  # publishes a single release tagged with the shared kernel version.
+  release:
+    name: Create consolidated release
+    needs: [prepare, build]
+    if: inputs.output == 'release'
+    runs-on: ubuntu-latest
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.buildinfo.outputs.kver }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}
