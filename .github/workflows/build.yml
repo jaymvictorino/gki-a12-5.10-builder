@@ -42,6 +42,26 @@ env:
   OUTPUT: ${{ inputs.output }}
 
 jobs:
+  # Decides which variants to build.
+  # - output=release:  both VNL and KSU, in parallel
+  # - output=actions:  only the variant the user picked
+  prepare:
+    name: Prepare build matrix
+    runs-on: ubuntu-latest
+    outputs:
+      variants: ${{ steps.set.outputs.variants }}
+    steps:
+      - name: Determine variants
+        id: set
+        run: |
+          if [[ "${{ inputs.output }}" == "release" ]]; then
+            variants='["VNL","KSU"]'
+          else
+            variants='["${{ inputs.variant }}"]'
+          fi
+          echo "variants=$variants" >> "$GITHUB_OUTPUT"
+          echo "Will build: $variants"
+
   build:
     name: Build android12-5.10 GKI (${{ inputs.variant }})
     runs-on: ubuntu-22.04
