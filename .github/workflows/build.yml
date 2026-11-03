@@ -238,6 +238,60 @@ jobs:
 
       - name: Inspect downloaded artifacts
         run: find artifacts -maxdepth 2 -type f | sort
+
+      - name: Prepare assets and metadata
+        id: prep
+        run: |
+          set -euo pipefail
+
+          mkdir -p release-assets
+          find artifacts -name 'AK3-*.zip' -exec mv {} release-assets/ \;
+
+          ZIP_COUNT=$(find release-assets -name 'AK3-*.zip' | wc -l)
+          echo "Found $ZIP_COUNT zip(s) for the release"
+          if [[ "$ZIP_COUNT" -lt 1 ]]; then
+            echo "No zip artifacts found — aborting" >&2
+            exit 1
+          fi
+
+          # Shared metadata: kver, kcommit, llvm, nomount, build_ts are identical
+          # across variants; prefer KSU's file because it also carries bakasu_ver.
+          META=""
+          for v in KSU VNL; do
+            f=$(find artifacts -name "metadata-${v}.json" | head -n1)
+            if [[ -n "$f" ]]; then META="$f"; break; fi
+          done
+          if [[ -z "$META" ]]; then
+            echo "No metadata file found — aborting" >&2
+            exit 1
+          fi
+          echo "Using metadata: $META"
+
+          KVER=$(jq -r '.kver' "$META")
+          KCOMMIT=$(jq -r '.kcommit_short' "$META")
+          KCOMMIT_LONG=$(jq -r '.kcommit_long' "$META")
+          LLVM=$(jq -r '.llvm_ver' "$META")
+          NOMOUNT=$(jq -r '.nomount_ver' "$META")
+          BUILT_AT=$(jq -r '.build_ts' "$META")
+
+          KSU_META=$(find artifacts -name 'metadata-KSU.json' | head -n1)
+          if [[ -n "$KSU_META" ]]; then
+            BAKASU=$(jq -r '.bakasu_ver' "$KSU_META")
+          else
+            BAKASU="n/a"
+          fi
+
+          {
+            echo "kver=$KVER"
+            echo "kcommit=$KCOMMIT"
+            echo "kcommit_long=$KCOMMIT_LONG"
+            echo "llvm=$LLVM"
+            echo "bakasu=$BAKASU"
+            echo "nomount=$NOMOUNT"
+            echo "built_at=$BUILT_AT"
+          } >> "$GITHUB_OUTPUT"
+
+          ls -lh release-assets/
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.buildinfo.outputs.kver }}-${{ env.VARIANT }}${{ env.STAGE_SUFFIX }}
